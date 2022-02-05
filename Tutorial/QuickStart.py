@@ -100,10 +100,39 @@ def test(dataloader, model, loss_fn):
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
 
 
-epoch = 100
+epoch = 10
 for t in range(epoch):
     print(f"Epoch {t+1}\n------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
     test(test_dataloader, model, loss_fn)
 print("Done!")
 
+#모델 저장하기
+torch.save(model.state_dict(), "model.pth")
+print("Saved Pytorch Model State to model.pth")
+
+#모델 불러오기
+model = NeuralNetwork()
+model.load_state_dict(torch.load("model.pth"))
+
+
+#모델을 이용하여 예측
+classes = [
+    "T-shirt/top",
+    "Trouser",
+    "Pullover",
+    "Dress",
+    "Coat",
+    "Sandal",
+    "Shirt",
+    "Sneaker",
+    "Bag",
+    "Ankle boot",
+]
+
+model.eval()
+x, y = test_data[0][0], test_data[0][1]
+with torch.no_grad():
+    pred = model(x)
+    predicted, actual = classes[pred[0].argmax(0)], classes[y]
+    print(f'Predicted: "{predicted}", Actual: "{actual}"')
