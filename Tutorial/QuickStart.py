@@ -75,9 +75,9 @@ def train(dataloader, model, loss_fn, optimizer):
         loss = loss_fn(pred, y)
         
         #역전파
-        optimizer.zero_grad() #?
-        loss.backward() #?
-        optimizer.step() #?
+        optimizer.zero_grad() #모델 매개변수의 변화도를 재설정, 기본적으로 변화도는 더해지기(add up) 때문에, 중복계산을 막기 위해서 반복할때마다 명시적으로 0으로 설정해야한다.
+        loss.backward() #loss에 대한 requires_grad가 True인 변수의 변화량 값 계산.
+        optimizer.step() #변화도를 계산한 뒤에 해당 함수를 호출하면 수집된 변화도로 매개변수를 조정한다.
         
         if batch % 100 == 0:
             loss, current = loss.item(), batch * len(X)
@@ -89,7 +89,7 @@ def test(dataloader, model, loss_fn):
     num_batchs = len(dataloader)
     model.eval()
     test_loss, correct = 0,0
-    with torch.no_grad(): #?
+    with torch.no_grad(): #연산 중에서 gradient를 계산하는 기록 추적, 변화도 계산 지원이 필요 없는 경우 사용 (연산추적 중지)
         for X, y in dataloader:
             X,y = X.to(device), y.to(device)
             pred = model(X)
